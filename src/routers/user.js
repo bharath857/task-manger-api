@@ -107,10 +107,10 @@ const upload = multer({
 /* <img src="data:image/jpg;base64, avatar" */
 router.post('/users/profile/avatar', auth, upload.single('avatar'), async (req, res) => {
     const buffer = await sharp(req.file.buffer).resize({
-        width:500,
-        height:500
+        width: 500,
+        height: 500
     }).png().toBuffer()
-req.user.avatar = buffer
+    req.user.avatar = buffer
     await req.user.save()
     res.send()
 }, (error, req, res, next) => {
