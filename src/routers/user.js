@@ -19,9 +19,9 @@ router.post('/users', async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            e
+            error:e
         }
-        res.status(400).send(e)
+        res.status(400).send(response)
     }
 })
 
@@ -30,9 +30,18 @@ router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken();
-        res.status(201).send({ user, token })
+        let response = {
+            success: true,
+            user,
+            token
+        }
+        res.status(201).send(response)
     } catch (e) {
-        res.status(400).send(e)
+        let response = {
+            success: false,
+            error:e
+        }
+        res.status(400).send(response)
     }
 })
 
@@ -43,10 +52,16 @@ router.post('/users/logout', auth, async (req, res) => {
             return token.token !== req.token
         });
         await req.user.save()
-
-        res.status(201).send({ logout: 'success' })
+        let response = {
+            success: true
+        }
+        res.status(201).send(response)
     } catch (e) {
-        res.status(400).send(e)
+        let response = {
+            success: false,
+            error:e
+        }
+        res.status(400).send(response)
     }
 })
 
@@ -55,18 +70,32 @@ router.post('/users/logoutAll', auth, async (req, res) => {
     try {
         req.user.tokens = []
         await req.user.save()
-
-        res.status(201).send({ logoutAll: 'success' })
+        let response = {
+            success: true
+        }
+        res.status(201).send(response)
     } catch (e) {
-        res.status(400).send(e)
+        let response = {
+            success: false,
+            error:e
+        }
+        res.status(400).send(response)
     }
 })
 
 router.get('/users/profile', auth, async (req, res) => {
     try {
-        res.send(req.user)
+        let response = {
+            success: true,
+            user: req.user
+        }
+        res.send(response)
     } catch (e) {
-        res.status(500).send()
+        let response = {
+            success: false,
+            error:e
+        }
+        res.status(500).send(response)
     }
 })
 
@@ -84,10 +113,17 @@ router.patch('/users/profile', auth, async (req, res) => {
         updates.forEach((update) => req.user[update] = req.body[update])
         await req.user.save();
         //const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-
-        res.status(200).send({ status: 'success', msg: 'Updates Successfully' })
+        let response = {
+            success: true,
+            user: req.user
+        }
+        res.status(200).send(response)
     } catch (e) {
-        res.status(400).send(e)
+        let response = {
+            success: false,
+            error:e
+        }
+        res.status(400).send(response)
     }
 })
 
@@ -95,9 +131,16 @@ router.delete('/users/profile', auth, async (req, res) => {
     try {
         //const user = await User.findByIdAndDelete(req.user._id)
         await req.user.remove()
-        res.send({ status: 'success', meg: 'User removed' })
+        let response = {
+            success: true
+        }
+        res.send(response)
     } catch (e) {
-        res.status(500).send()
+        let response = {
+            success: false,
+            error:e
+        }
+        res.status(500).send(response)
     }
 })
 
@@ -121,15 +164,25 @@ router.post('/users/profile/avatar', auth, upload.single('avatar'), async (req, 
     }).png().toBuffer()
     req.user.avatar = buffer
     await req.user.save()
-    res.send()
+    let response = {
+        success: true
+    }
+    res.send(response)
 }, (error, req, res, next) => {
-    res.status(400).send({ error: error.message })
+    let response = {
+        success: false,
+        error: error.message
+    }
+    res.status(400).send(response)
 })
 
 router.delete('/users/profile/avatar', auth, async (req, res) => {
     req.user.avatar = undefined
     await req.user.remove()
-    res.send()
+    let response = {
+        success: true
+    }
+    res.send(response)
 })
 
 router.get('/users/:id/avatar', async (req, res) => {
@@ -139,9 +192,17 @@ router.get('/users/:id/avatar', async (req, res) => {
             throw new Error()
         }
         res.set('Content-Type', 'image/png')
-        res.send(user.avatar)
+        let response = {
+            success: true,
+            avatar: user.avatar
+        }
+        res.send(response)
     } catch (e) {
-        res.status(400).send()
+        let response = {
+            success: false,
+            error: e
+        }
+        res.status(400).send(response)
     }
 })
 
