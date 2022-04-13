@@ -105,7 +105,11 @@ router.patch('/users/profile', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        let response = {
+            success: false,
+            error: 'Invalid updates!'
+        }
+        return res.status(400).send(response)
     }
 
     try {
