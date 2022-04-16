@@ -13,9 +13,17 @@ router.post('/tasks', auth, async (req, res) => {
 
     try {
         await task.save()
-        res.status(201).send(task)
+        let response ={
+            success: true,
+            task:task
+        }
+        res.status(201).send(response)
     } catch (e) {
-        res.status(400).send(e)
+        let response ={
+            success: true,
+            error:e
+        }
+        res.status(400).send(response)
     }
 })
 
