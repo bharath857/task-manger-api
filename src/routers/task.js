@@ -20,7 +20,7 @@ router.post('/tasks', auth, async (req, res) => {
         res.status(201).send(response)
     } catch (e) {
         let response ={
-            success: true,
+            success: false,
             error:e
         }
         res.status(400).send(response)
@@ -87,7 +87,11 @@ router.patch('/tasks/:id', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates!' })
+        let response = {
+            success:false,
+            error:'Invalid updates!'
+        }
+        return res.status(400).send(response)
     }
 
     try {
@@ -102,9 +106,17 @@ router.patch('/tasks/:id', auth, async (req, res) => {
 
         updates.forEach((update => task[update] = req.body[update]))
         await task.save();
-        res.send(task)
+        let response = {
+            success:true,
+            task
+        }
+        res.send(response)
     } catch (e) {
-        res.status(401).send(e)
+        let response = {
+            success:false,
+            error:e
+        }
+        res.status(401).send(response)
     }
 })
 

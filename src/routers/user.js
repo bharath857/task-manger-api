@@ -200,7 +200,7 @@ router.get('/users/:id/avatar', async (req, res) => {
             success: true,
             avatar: user.avatar
         }
-        res.send(response)
+        res.send(user.avatar)
     } catch (e) {
         let response = {
             success: false,
