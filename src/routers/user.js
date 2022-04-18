@@ -19,7 +19,7 @@ router.post('/users', async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(400).send(response)
     }
@@ -39,7 +39,7 @@ router.post('/users/login', async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(400).send(response)
     }
@@ -59,7 +59,7 @@ router.post('/users/logout', auth, async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(400).send(response)
     }
@@ -77,7 +77,7 @@ router.post('/users/logoutAll', auth, async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(400).send(response)
     }
@@ -93,7 +93,7 @@ router.get('/users/profile', auth, async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(500).send(response)
     }
@@ -125,7 +125,7 @@ router.patch('/users/profile', auth, async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(400).send(response)
     }
@@ -142,7 +142,7 @@ router.delete('/users/profile', auth, async (req, res) => {
     } catch (e) {
         let response = {
             success: false,
-            error:e
+            error: e
         }
         res.status(500).send(response)
     }
@@ -162,16 +162,26 @@ const upload = multer({
 })
 /* <img src="data:image/jpg;base64, avatar" */
 router.post('/users/profile/avatar', auth, upload.single('avatar'), async (req, res) => {
-    const buffer = await sharp(req.file.buffer).resize({
-        width: 500,
-        height: 500
-    }).png().toBuffer()
-    req.user.avatar = buffer
-    await req.user.save()
-    let response = {
-        success: true
+    try {
+        const buffer = await sharp(req.file.buffer).resize({
+            width: 500,
+            height: 500
+        }).png().toBuffer()
+        req.user.avatar = buffer
+        await req.user.save()
+        let response = {
+            success: true
+        }
+        res.send(response)
+    } catch (e) {
+        throw new Error('Unable to find file')
+        /* let response = {
+            success: false,
+            error: error.message
+        }
+        res.status(400).send(response) */
     }
-    res.send(response)
+
 }, (error, req, res, next) => {
     let response = {
         success: false,
@@ -182,7 +192,7 @@ router.post('/users/profile/avatar', auth, upload.single('avatar'), async (req, 
 
 router.delete('/users/profile/avatar', auth, async (req, res) => {
     req.user.avatar = undefined
-    await req.user.remove()
+    await req.user.save()
     let response = {
         success: true
     }
